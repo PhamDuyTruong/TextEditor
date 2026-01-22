@@ -1,4 +1,4 @@
-# 🎨 Editor Canvas Test
+# 🎨 Editor Canvas Text
 
 A Canvas Editor application built with React + Vite, allowing you to create and edit text elements.
 
