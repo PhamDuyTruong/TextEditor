@@ -47,7 +47,7 @@ export function measureText(ctx, text, fontSize, fontFamily, maxWidth = Infinity
 
   return {
     width: maxLineWidth || 0,
-    height: Math.max(lines.length * fontSize * 1.2, fontSize * 1.2),
+    height: Math.max(lines.length * fontSize * 1.1, fontSize * 1.1),  // Reduced from 1.2 to 1.15 for tighter fit
     lines,
   }
 }
@@ -76,8 +76,9 @@ export function measureTextDimensions(text, fontSize, fontFamily = 'Arial') {
   
   const measurements = measureText(ctx, text, fontSize, fontFamily, Infinity)
   
+  // Minimal padding for tight fit
   const paddingX = 20
-  const paddingY = 10
+  const paddingY = 4  // Reduced from 10 to 4 for tighter height fit
   
   return {
     width: Math.max(100, measurements.width + paddingX),

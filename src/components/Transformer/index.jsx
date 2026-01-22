@@ -82,7 +82,7 @@ const Transformer = observer(({ isEditing }) => {
       const ctx = canvas.getContext('2d')
 
       const paddingX = 20
-      const paddingY = 10
+      const paddingY = 4  // Match with measureTextDimensions for consistent height
       const maxWidth = newWidth - paddingX
 
       const measurements = measureText(

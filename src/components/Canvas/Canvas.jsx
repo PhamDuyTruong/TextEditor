@@ -14,14 +14,13 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
   const [editingElementId, setEditingElementId] = useState(null)
   const [contextMenuPosition, setContextMenuPosition] = useState(null)
   const inputRef = useRef(null)
-  const handleTextBlurRef = useRef(null) // Store handleTextBlur reference
+  const handleTextBlurRef = useRef(null)
 
   // Initialize canvas
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // Set canvas size to fixed page size (1080x1080)
     const resizeCanvas = () => {
       canvas.width = canvasStore.pageWidth
       canvas.height = canvasStore.pageHeight
@@ -41,8 +40,8 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
       handleElementDrag,
       handleElementDoubleClick,
       handleContextMenu,
-      () => isEditing, // Pass isEditing checker
-      handleTextBlurRef // Pass handleTextBlur ref
+      () => isEditing,
+      handleTextBlurRef
     )
 
     return () => {
@@ -93,11 +92,11 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
           const textToDisplay = element.text || ''
           inputRef.current.innerHTML = textToDisplay.replace(/\n/g, '<br>')
           inputRef.current.focus()
-          
+
           // Place cursor at end
           const range = document.createRange()
           const sel = window.getSelection()
-          
+
           // Make sure there's content to select
           if (inputRef.current.childNodes.length > 0) {
             range.selectNodeContents(inputRef.current)
@@ -107,7 +106,7 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
             range.setStart(inputRef.current, 0)
             range.setEnd(inputRef.current, 0)
           }
-          
+
           sel.removeAllRanges()
           sel.addRange(range)
         }
@@ -131,10 +130,10 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
         // Save original position to prevent any accidental movement
         const originalX = element.x
         const originalY = element.y
-        
+
         // Get text from contentEditable HTML, converting to plain text with line breaks
         const htmlContent = e.currentTarget.innerHTML
-        
+
         let newText = htmlContent
           .replace(/<div><br><\/div>/gi, '\n')
           .replace(/<div>/gi, '\n')
@@ -142,42 +141,39 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
           .replace(/<\/div>/gi, '')
           .replace(/&nbsp;/gi, ' ')
           .replace(/<[^>]*>/g, '')
-        
+
         // Only trim leading newline if there's actual text content
         newText = newText.replace(/^\n/, '')
-        
+
         // Safety: ensure we don't save empty/whitespace-only text
         if (!newText || newText.trim().length === 0) {
           console.warn('[handleTextInput] Text is empty, keeping original:', element.text)
           return
         }
 
-        console.log('[handleTextInput] New text:', newText)
-        
         element.setText(newText)
-        
+
         // Measure text and update element size
         const canvas = canvasRef.current
         const ctx = canvas.getContext('2d')
         ctx.font = `${element.fontSize}px ${element.fontFamily}`
-        
+
         // Split by lines
         const lines = newText.split('\n')
         let maxWidth = 0
-        
+
         lines.forEach(line => {
           const metrics = ctx.measureText(line || ' ')
           maxWidth = Math.max(maxWidth, metrics.width)
         })
-        
+
         // Calculate new dimensions
         const newWidth = Math.max(100, maxWidth + 20)
-        const lineHeight = element.fontSize * 1.2
-        const newHeight = Math.max(element.fontSize + 10, lines.length * lineHeight + 10)
-        
+        const lineHeight = element.fontSize * 1.1  // Match with measureText for consistent height
+        const newHeight = Math.max(element.fontSize + 4, lines.length * lineHeight + 4)  // Reduced padding for tighter fit
+
         element.setSize(newWidth, newHeight)
-        
-        // Ensure position hasn't changed (safety check)
+
         if (element.x !== originalX || element.y !== originalY) {
           element.setPosition(originalX, originalY)
         }
@@ -187,18 +183,13 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
 
   // Handle text blur (finish editing)
   const handleTextBlur = React.useCallback(() => {
-    console.log('[handleTextBlur] Called!')
-    console.log('[handleTextBlur] Editing element ID:', editingElementId)
-    console.log('[handleTextBlur] Input ref:', inputRef.current)
     if (editingElementId && inputRef.current) {
       const element = canvasStore.elements.find(el => el.id === editingElementId)
-      console.log('[handleTextBlur] Canvas store elements:', canvasStore.elements)
-      console.log('[handleTextBlur] Element:', element)
       if (element) {
         // Get text from contentEditable, preserving line breaks
         // contentEditable uses <br> or <div> for line breaks, need to convert to \n
         const htmlContent = inputRef.current.innerHTML
-        
+
         // Convert HTML to text with line breaks preserved
         let finalText = htmlContent
           .replace(/<div><br><\/div>/gi, '\n') // Empty line
@@ -207,10 +198,10 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
           .replace(/<\/div>/gi, '') // Remove closing div
           .replace(/&nbsp;/gi, ' ') // Non-breaking space
           .replace(/<[^>]*>/g, '') // Remove any other HTML tags
-        
+
         // Trim only trailing newlines, keep intentional ones
         finalText = finalText.replace(/^\n/, '') // Remove leading newline if any
-        
+
         // Safety: ensure we don't save empty/whitespace-only text
         if (!finalText || finalText.trim().length === 0) {
           console.warn('[handleTextBlur] Text is empty after conversion, keeping original:', element.text)
@@ -219,7 +210,7 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
           setEditingElementId(null)
           return
         }
-        
+
         element.setText(finalText)
         canvasStore.saveState()
       }
@@ -227,7 +218,7 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
     setIsEditing(false)
     setEditingElementId(null)
   }, [editingElementId, setIsEditing])
-  
+
   // Store handleTextBlur in ref so CanvasInteractions can call it
   React.useEffect(() => {
     handleTextBlurRef.current = handleTextBlur
@@ -247,19 +238,17 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
       setIsEditing(false)
       setEditingElementId(null)
     }
-    // Allow Enter for new lines (don't prevent default)
   }
 
-  // Get inline editor style based on element and canvas
   const getInlineEditorStyle = () => {
     if (!canvasStore.selectedElement || !canvasRef.current) return {}
-    
+
     const element = canvasStore.selectedElement
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
     const scaleX = rect.width / canvas.width
     const scaleY = rect.height / canvas.height
-    
+
     return {
       position: 'absolute',
       left: `${element.x * scaleX}px`,
@@ -270,7 +259,7 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
       fontFamily: element.fontFamily,
       color: element.color,
       textAlign: element.alignment,
-      lineHeight: '1.2',
+      lineHeight: '1',
       padding: '4px',
       border: '2px solid #1976d2',
       outline: 'none',

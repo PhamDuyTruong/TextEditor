@@ -109,7 +109,7 @@ class CanvasRenderer {
     const textMetrics = measureText(ctx, element.text, element.fontSize, element.fontFamily, maxWidth)
 
     // Draw text lines
-    const lineHeight = element.fontSize * 1.2
+    const lineHeight = element.fontSize * 1.15  // Match with measureText for consistent rendering
     textMetrics.lines.forEach((line, index) => {
       const lineY = screenY + index * lineHeight
       ctx.fillText(line, textX, lineY, maxWidth)

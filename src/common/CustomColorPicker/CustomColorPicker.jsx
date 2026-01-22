@@ -11,7 +11,6 @@ const CustomColorPicker = ({
   const [isOpen, setIsOpen] = useState(false)
   const pickerRef = useRef(null)
 
-  // Notify parent when picker open state changes
   useEffect(() => {
     onOpenChange?.(isOpen)
   }, [isOpen, onOpenChange])
