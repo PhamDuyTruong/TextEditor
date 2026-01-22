@@ -25,7 +25,6 @@ Before starting, make sure you have installed:
 ```bash
 # If you have Git
 git clone https://github.com/PhamDuyTruong/TextEditor.git
-cd EditorCanvasTest
 
 # Or download ZIP and extract
 ```
