@@ -219,12 +219,10 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
     setEditingElementId(null)
   }, [editingElementId, setIsEditing])
 
-  // Store handleTextBlur in ref so CanvasInteractions can call it
   React.useEffect(() => {
     handleTextBlurRef.current = handleTextBlur
   }, [handleTextBlur])
 
-  // Handle text edit key down
   const handleTextKeyDown = (e) => {
     if (e.key === 'Escape') {
       e.preventDefault()
@@ -249,12 +247,17 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
     const scaleX = rect.width / canvas.width
     const scaleY = rect.height / canvas.height
 
+    const scaledWidth = element.width * scaleX
+    const scaledHeight = element.height * scaleY
+    const scaledX = element.x * scaleX
+    const scaledY = element.y * scaleY
+
     return {
       position: 'absolute',
-      left: `${element.x * scaleX}px`,
-      top: `${element.y * scaleY}px`,
-      width: `${element.width * scaleX}px`,
-      minHeight: `${element.height * scaleY}px`,
+      left: `${scaledX}px`,
+      top: `${scaledY}px`,
+      width: `${scaledWidth}px`,
+      minHeight: `${scaledHeight}px`,
       fontSize: `${element.fontSize * scaleX}px`,
       fontFamily: element.fontFamily,
       color: element.color,
@@ -263,15 +266,14 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
       padding: '4px',
       border: '2px solid #1976d2',
       outline: 'none',
-      background: 'rgba(255, 255, 255, 0.95)',
+      background: 'rgba(255, 255, 255, 1)',
       boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
       whiteSpace: 'pre-wrap',
       wordWrap: 'break-word',
       overflow: 'hidden',
       zIndex: 1001,
       cursor: 'text',
-      transformOrigin: 'top left',
-      transform: `rotate(${element.rotation}rad)`,
+      transform: `rotate(${element.rotation}deg)`,
     }
   }
 
