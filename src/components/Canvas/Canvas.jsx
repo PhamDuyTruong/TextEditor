@@ -50,8 +50,6 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
       }
     }
   }, [])
-
-  // Render loop using useAnimationFrame hook
   useAnimationFrame(() => {
     if (rendererRef.current) {
       rendererRef.current.render(
@@ -64,12 +62,6 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
     }
   })
 
-  // Update isEditingChecker when isEditing changes
-  useEffect(() => {
-    if (interactionsRef.current) {
-      interactionsRef.current.updateIsEditingChecker(() => isEditing)
-    }
-  }, [isEditing])
 
   const handleElementClick = (id) => {
     // Handled by CanvasInteractions
@@ -219,9 +211,6 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
     setEditingElementId(null)
   }, [editingElementId, setIsEditing])
 
-  React.useEffect(() => {
-    handleTextBlurRef.current = handleTextBlur
-  }, [handleTextBlur])
 
   const handleTextKeyDown = (e) => {
     if (e.key === 'Escape') {
@@ -276,6 +265,16 @@ const Canvas = observer(({ isEditing, setIsEditing }) => {
       transform: `rotate(${element.rotation}deg)`,
     }
   }
+
+  useEffect(() => {
+    if (interactionsRef.current) {
+      interactionsRef.current.updateIsEditingChecker(() => isEditing)
+    }
+  }, [isEditing])
+
+  useEffect(() => {
+    handleTextBlurRef.current = handleTextBlur
+  }, [handleTextBlur])
 
   return (
     <div className="canvas-container" style={{ width: canvasStore.pageWidth, height: canvasStore.pageHeight }}>
