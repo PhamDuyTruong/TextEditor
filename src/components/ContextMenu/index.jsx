@@ -76,7 +76,7 @@ const ContextMenu = observer(({ anchorPosition, onClose, onElementClick }) => {
   return (
     <div
       ref={menuRef}
-      className="context-menu"
+      className={`context-menu ${!selectedElement ? 'isHidden' : ''}`}
       style={{
         left: `${menuPosition.x}px`,
         top: `${menuPosition.y}px`,

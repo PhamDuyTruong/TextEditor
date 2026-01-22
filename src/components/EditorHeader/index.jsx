@@ -106,12 +106,14 @@ const EditorHeader = observer(() => {
                             onClick={handleUndo}
                             disabled={!canUndo}
                             tooltip="Undo (Ctrl+Z)"
+                            tooltipPosition='bottom'
                         />
                         <CustomButton
                             icon={<RedoIcon />}
                             onClick={handleRedo}
                             disabled={!canRedo}
                             tooltip="Redo (Ctrl+Y)"
+                            tooltipPosition='bottom'
                         />
                     </div>
                     <CustomDivider />
