@@ -15,7 +15,7 @@ function throttle(func, delay) {
  * CanvasInteractions
  * Handles all mouse and keyboard interactions with canvas
  * 
- * Note: This class cannot use React hooks like useThrottledCallback
+ * Note: This class cannot use React hooks like useThrottle
  * because it's a class-based component, not a functional component.
  * Therefore, we use an inline throttle utility function.
  */

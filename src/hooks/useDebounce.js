@@ -1,35 +1,50 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
-/**
- * Custom hook to debounce a value
- * @param {any} value - Value to debounce
- * @param {number} delay - Delay in milliseconds (default: 500ms)
- * @returns {any} Debounced value
- * 
- * @example
- * const debouncedSearchTerm = useDebounce(searchTerm, 500)
- * 
- * useEffect(() => {
- *   // This will only run 500ms after user stops typing
- *   fetchSearchResults(debouncedSearchTerm)
- * }, [debouncedSearchTerm])
- */
-export function useDebounce(value, delay = 500) {
-  const [debouncedValue, setDebouncedValue] = useState(value)
+export function useDebounce(valueOrCallback, delay = 500, dependencies = []) {
+  const isFunction = typeof valueOrCallback === 'function'
+
+  const [debouncedValue, setDebouncedValue] = useState(
+    isFunction ? null : valueOrCallback
+  )
 
   useEffect(() => {
-    // Set timeout to update debounced value after delay
-    const timeoutId = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
+    if (!isFunction) {
+      const timeoutId = setTimeout(() => {
+        setDebouncedValue(valueOrCallback)
+      }, delay)
 
-    // Cleanup function to cancel timeout if value changes
-    return () => {
-      clearTimeout(timeoutId)
+      // Cleanup function to cancel timeout if value changes
+      return () => {
+        clearTimeout(timeoutId)
+      }
     }
-  }, [value, delay])
+  }, [valueOrCallback, delay, isFunction])
 
-  return debouncedValue
+  const timeoutRef = useRef(null)
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  const debouncedCallback = useCallback(
+    (...args) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        valueOrCallback(...args)
+      }, delay)
+    },
+    [valueOrCallback, delay, ...dependencies]
+  )
+
+  return isFunction ? debouncedCallback : debouncedValue
 }
 
 export default useDebounce

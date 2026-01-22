@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import canvasStore from '../../stores/CanvasStore'
 import { measureText } from '../../utils/textUtils'
-import { useThrottledCallback } from '../../hooks/useThrottledCallback'
+import { useThrottle } from '../../hooks/useThrottle'
 
 const HANDLE_SIZE = 8
 const ROTATION_HANDLE_DISTANCE = 30
@@ -126,7 +126,7 @@ const Transformer = observer(({ isEditing }) => {
     selectedElement.setRotation(newRotation)
   }, [selectedElement])
 
-  const handleMouseMoveThrottled = useThrottledCallback((e) => {
+  const handleMouseMoveThrottled = useThrottle((e) => {
     if (!selectedElement) return
 
     const canvas = document.querySelector('.canvas')
