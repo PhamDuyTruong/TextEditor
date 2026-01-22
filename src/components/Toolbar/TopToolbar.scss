@@ -1,0 +1,101 @@
+.top-toolbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.top-toolbar__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 0 24px;
+}
+
+.top-toolbar__left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.top-toolbar__center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-toolbar__right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.top-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.top-toolbar__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+.top-toolbar__name-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.top-toolbar__name-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.top-toolbar__name-input {
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: none;
+  border-bottom: 2px solid #1976d2;
+  outline: none;
+  background: transparent;
+  color: #333;
+  min-width: 200px;
+
+  &:focus {
+    border-bottom-color: #1565c0;
+  }
+}

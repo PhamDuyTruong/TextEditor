@@ -1,0 +1,47 @@
+.custom-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0 2px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #333;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover:not(.custom-button--disabled) {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &:active:not(.custom-button--disabled) {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  }
+}
+
+.custom-button--selected {
+  background-color: #e3f2fd;
+  color: #1976d2;
+
+  &:hover:not(.custom-button--disabled) {
+    background-color: #bbdefb;
+  }
+}
+
+.custom-button--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

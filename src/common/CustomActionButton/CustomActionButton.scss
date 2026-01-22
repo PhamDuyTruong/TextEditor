@@ -1,0 +1,61 @@
+.custom-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  }
+}
+
+.custom-action-button--default {
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #ddd;
+
+  &:hover:not(.custom-action-button--disabled) {
+    background-color: #f5f5f5;
+    border-color: #ccc;
+  }
+}
+
+.custom-action-button--primary {
+  background-color: #1976d2;
+  color: white;
+
+  &:hover:not(.custom-action-button--disabled) {
+    background-color: #1565c0;
+  }
+
+  &:active:not(.custom-action-button--disabled) {
+    background-color: #0d47a1;
+  }
+}
+
+.custom-action-button--danger {
+  background-color: #d32f2f;
+  color: white;
+
+  &:hover:not(.custom-action-button--disabled) {
+    background-color: #c62828;
+  }
+
+  &:active:not(.custom-action-button--disabled) {
+    background-color: #b71c1c;
+  }
+}
+
+.custom-action-button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

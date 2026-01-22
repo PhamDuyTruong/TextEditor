@@ -1,0 +1,30 @@
+.page-indicator {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.page-indicator__text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-right: 4px;
+}
+
+.page-indicator__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-left: 1px solid #e0e0e0;
+  padding-left: 8px;
+  margin-left: 8px;
+}
