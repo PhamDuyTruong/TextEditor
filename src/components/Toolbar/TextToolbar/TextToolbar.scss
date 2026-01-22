@@ -1,0 +1,35 @@
+.floating-text-toolbar {
+    position: fixed;
+    top: 96px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    padding: 8px 16px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .floating-text-toolbar__content {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .floating-text-toolbar__alignment-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .floating-text-toolbar__alignment {
+    display: flex;
+    align-items: center;
+  }
+  
+  .floating-text-toolbar__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+  }

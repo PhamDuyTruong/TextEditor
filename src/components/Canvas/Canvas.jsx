@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import canvasStore from '../../stores/CanvasStore'
 import CanvasRenderer from '../../models/CanvasRenderer'
 import CanvasInteractions from '../../models/CanvasInteractions'
-import ContextMenu from '../ContextMenu/ContextMenu'
+import ContextMenu from '../ContextMenu'
 import { useAnimationFrame } from '../../hooks'
 import '../Canvas/Canvas.scss'
 

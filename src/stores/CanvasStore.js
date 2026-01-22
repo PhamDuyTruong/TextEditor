@@ -14,8 +14,8 @@ class CanvasStore {
   panY = 0
   historyStore = new HistoryStore()
   // Canvas page settings - Fixed size
-  pageWidth = 1080
-  pageHeight = 1080
+  pageWidth = 1024
+  pageHeight = 1024
   backgroundColor = '#ffffff'
   // UI state
   isDropdownOpen = false

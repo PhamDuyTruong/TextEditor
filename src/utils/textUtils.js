@@ -1,12 +1,3 @@
-/**
- * Measure text dimensions
- * @param {CanvasRenderingContext2D} ctx - Canvas context
- * @param {string} text - Text to measure
- * @param {number} fontSize - Font size
- * @param {string} fontFamily - Font family
- * @param {number} maxWidth - Maximum width (for wrapping)
- * @returns {{width: number, height: number, lines: string[]}} Text dimensions and lines
- */
 export function measureText(ctx, text, fontSize, fontFamily, maxWidth = Infinity) {
   ctx.font = `${fontSize}px ${fontFamily}`
   ctx.textBaseline = 'top'
@@ -73,8 +64,23 @@ export function getTextAlign(alignment) {
     case 'right':
       return 'right'
     case 'justify':
-      return 'left' // Canvas doesn't support justify, use left
+      return 'left'
     default:
       return 'left'
+  }
+}
+
+export function measureTextDimensions(text, fontSize, fontFamily = 'Arial') {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  
+  const measurements = measureText(ctx, text, fontSize, fontFamily, Infinity)
+  
+  const paddingX = 20
+  const paddingY = 10
+  
+  return {
+    width: Math.max(100, measurements.width + paddingX),
+    height: measurements.height + paddingY
   }
 }

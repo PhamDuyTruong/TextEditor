@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import canvasStore from '../../stores/CanvasStore'
-import { getRotatedBoundingBox } from '../../utils/canvasUtils'
-import { useThrottledCallback } from '../../hooks'
+import { measureText } from '../../utils/textUtils'
+import { useThrottledCallback } from '../../hooks/useThrottledCallback'
 
 const HANDLE_SIZE = 8
-const ROTATION_HANDLE_DISTANCE = 16
+const ROTATION_HANDLE_DISTANCE = 30
+const ROTATION_HANDLE_SIZE = 32
 
-const TransformHandles = observer(({ isEditing }) => {
-  const canvasRef = useRef(null)
+const Transformer = observer(({ isEditing }) => {
   const isResizingRef = useRef(false)
   const isRotatingRef = useRef(false)
   const resizeHandleRef = useRef(null)
@@ -17,10 +17,9 @@ const TransformHandles = observer(({ isEditing }) => {
 
   const selectedElement = canvasStore.selectedElement
 
-  // Define resize and rotation handlers
   const handleResize = useCallback((x, y, handle, maintainAspectRatio) => {
     if (!selectedElement) return
-    
+
     const { x: startX, y: startY } = dragStartRef.current
     const { x: elX, y: elY, width: elWidth, height: elHeight } = elementStartRef.current
 
@@ -50,7 +49,6 @@ const TransformHandles = observer(({ isEditing }) => {
       newHeight = elHeight + deltaY
     }
 
-    // Maintain aspect ratio if Shift is pressed
     if (maintainAspectRatio) {
       const aspectRatio = elWidth / elHeight
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -66,7 +64,6 @@ const TransformHandles = observer(({ isEditing }) => {
       }
     }
 
-    // Apply minimum size constraints
     if (newWidth < 50) {
       newWidth = 50
       if (position.includes('w')) {
@@ -80,13 +77,41 @@ const TransformHandles = observer(({ isEditing }) => {
       }
     }
 
+    if (!maintainAspectRatio && (position.includes('e') || position.includes('w'))) {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      const paddingX = 20
+      const paddingY = 10
+      const maxWidth = newWidth - paddingX
+
+      const measurements = measureText(
+        ctx,
+        selectedElement.text,
+        selectedElement.fontSize,
+        selectedElement.fontFamily,
+        maxWidth
+      )
+
+      const calculatedHeight = measurements.height + paddingY
+
+      if (calculatedHeight > 30) {
+        const heightDelta = calculatedHeight - newHeight
+        newHeight = calculatedHeight
+
+        if (position.includes('n')) {
+          newY = newY - heightDelta
+        }
+      }
+    }
+
     selectedElement.setPosition(newX, newY)
     selectedElement.setSize(newWidth, newHeight)
   }, [selectedElement])
 
   const handleRotation = useCallback((x, y) => {
     if (!selectedElement) return
-    
+
     const { x: elX, y: elY, width: elWidth, height: elHeight } = elementStartRef.current
     const centerX = elX + elWidth / 2
     const centerY = elY + elHeight / 2
@@ -96,12 +121,11 @@ const TransformHandles = observer(({ isEditing }) => {
     const deltaAngle = ((angle2 - angle1) * 180) / Math.PI
 
     let newRotation = elementStartRef.current.rotation + deltaAngle
-    newRotation = ((newRotation % 360) + 360) % 360 // Normalize to 0-360
+    newRotation = ((newRotation % 360) + 360) % 360
 
     selectedElement.setRotation(newRotation)
   }, [selectedElement])
 
-  // Throttled mouse move handler using hook
   const handleMouseMoveThrottled = useThrottledCallback((e) => {
     if (!selectedElement) return
 
@@ -112,10 +136,9 @@ const TransformHandles = observer(({ isEditing }) => {
     const screenX = e.clientX - rect.left
     const screenY = e.clientY - rect.top
 
-    // Calculate scale factor
     const scaleX = canvas.width / rect.width
     const scaleY = canvas.height / rect.height
-    
+
     const canvasPos = {
       x: screenX * scaleX,
       y: screenY * scaleY
@@ -128,85 +151,69 @@ const TransformHandles = observer(({ isEditing }) => {
     }
   }, 16, [selectedElement, handleResize, handleRotation])
 
-  useEffect(() => {
-    if (!selectedElement) return
+  const handleHandleMouseDown = useCallback((handle, e) => {
+    e.preventDefault()
+    e.stopPropagation()
 
     const canvas = document.querySelector('.canvas')
     if (!canvas) return
 
-    const handleMouseDown = (e) => {
-      const rect = canvas.getBoundingClientRect()
-      const screenX = e.clientX - rect.left
-      const screenY = e.clientY - rect.top
-
-      // Calculate scale factor
-      const scaleX = canvas.width / rect.width
-      const scaleY = canvas.height / rect.height
-      
-      const canvasPos = {
-        x: screenX * scaleX,
-        y: screenY * scaleY
-      }
-
-      // Check which handle was clicked
-      const handle = getHandleAtPoint(canvasPos.x, canvasPos.y, selectedElement)
-      if (handle) {
-        e.preventDefault()
-        e.stopPropagation()
-
-        if (handle.type === 'rotation') {
-          isRotatingRef.current = true
-        } else {
-          isResizingRef.current = true
-          resizeHandleRef.current = handle
-        }
-
-        dragStartRef.current = { x: canvasPos.x, y: canvasPos.y }
-        elementStartRef.current = {
-          x: selectedElement.x,
-          y: selectedElement.y,
-          width: selectedElement.width,
-          height: selectedElement.height,
-          rotation: selectedElement.rotation,
-        }
-
-        canvas.style.cursor = handle.type === 'rotation' ? 'crosshair' : getResizeCursor(handle.position)
-      }
+    if (handle.type === 'rotation') {
+      isRotatingRef.current = true
+    } else {
+      isResizingRef.current = true
+      resizeHandleRef.current = handle
     }
 
+    const rect = canvas.getBoundingClientRect()
+    const screenX = e.clientX - rect.left
+    const screenY = e.clientY - rect.top
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+
+    dragStartRef.current = {
+      x: screenX * scaleX,
+      y: screenY * scaleY
+    }
+
+    elementStartRef.current = {
+      x: selectedElement.x,
+      y: selectedElement.y,
+      width: selectedElement.width,
+      height: selectedElement.height,
+      rotation: selectedElement.rotation,
+    }
+
+    canvas.style.cursor = handle.type === 'rotation' ? 'grabbing' : getResizeCursor(handle.position)
+  }, [selectedElement])
+
+  useEffect(() => {
+    if (!selectedElement) return
+
     const handleMouseUp = () => {
+      const canvas = document.querySelector('.canvas')
+
       if (isResizingRef.current || isRotatingRef.current) {
         canvasStore.saveState()
       }
+
       isResizingRef.current = false
       isRotatingRef.current = false
       resizeHandleRef.current = null
+
       if (canvas) {
         canvas.style.cursor = 'default'
       }
     }
 
-    canvas.addEventListener('mousedown', handleMouseDown)
     window.addEventListener('mousemove', handleMouseMoveThrottled)
     window.addEventListener('mouseup', handleMouseUp)
 
     return () => {
-      canvas.removeEventListener('mousedown', handleMouseDown)
       window.removeEventListener('mousemove', handleMouseMoveThrottled)
       window.removeEventListener('mouseup', handleMouseUp)
     }
   }, [selectedElement, handleMouseMoveThrottled])
-
-  const getHandleAtPoint = (x, y, element) => {
-    const handles = getHandles(element)
-    for (const handle of handles) {
-      const distance = Math.sqrt(Math.pow(x - handle.x, 2) + Math.pow(y - handle.y, 2))
-      if (distance < HANDLE_SIZE / 2) {
-        return handle
-      }
-    }
-    return null
-  }
 
   const getHandles = (element) => {
     if (!element) return []
@@ -216,14 +223,12 @@ const TransformHandles = observer(({ isEditing }) => {
     const centerX = x + width / 2
     const centerY = y + height / 2
 
-    // Corner handles
+    // Corner handles and horizontal middle handles (removed vertical middle for better UX)
     const positions = [
       { pos: 'nw', x: x, y: y },
       { pos: 'ne', x: x + width, y: y },
       { pos: 'sw', x: x, y: y + height },
       { pos: 'se', x: x + width, y: y + height },
-      { pos: 'n', x: centerX, y: y },
-      { pos: 's', x: centerX, y: y + height },
       { pos: 'w', x: x, y: centerY },
       { pos: 'e', x: x + width, y: centerY },
     ]
@@ -238,8 +243,8 @@ const TransformHandles = observer(({ isEditing }) => {
       })
     })
 
-    // Rotation handle
-    const rotationHandleY = y - ROTATION_HANDLE_DISTANCE
+    // Rotation handle - positioned below the element (Canva-style)
+    const rotationHandleY = y + height + ROTATION_HANDLE_DISTANCE
     const rotatedRotationHandle = rotatePoint(centerX, rotationHandleY, centerX, centerY, rotation)
     handles.push({
       type: 'rotation',
@@ -299,27 +304,63 @@ const TransformHandles = observer(({ isEditing }) => {
         const x = rect.left + handle.x / scaleX
         const y = rect.top + handle.y / scaleY
 
+        // Different styling for rotation handle (Canva-style)
+        const isRotation = handle.type === 'rotation'
+        const handleSize = isRotation ? ROTATION_HANDLE_SIZE : HANDLE_SIZE
+
         return (
           <div
             key={index}
+            onMouseDown={(e) => handleHandleMouseDown(handle, e)}
             style={{
               position: 'fixed',
-              left: `${x - HANDLE_SIZE / 2}px`,
-              top: `${y - HANDLE_SIZE / 2}px`,
-              width: `${HANDLE_SIZE}px`,
-              height: `${HANDLE_SIZE}px`,
-              backgroundColor: handle.type === 'rotation' ? '#1976d2' : '#fff',
-              border: `2px solid ${handle.type === 'rotation' ? '#fff' : '#1976d2'}`,
-              borderRadius: handle.type === 'rotation' ? '50%' : '2px',
+              left: `${x - handleSize / 2}px`,
+              top: `${y - handleSize / 2}px`,
+              width: `${handleSize}px`,
+              height: `${handleSize}px`,
+              backgroundColor: '#fff',
+              border: isRotation ? '1px solid #e0e0e0' : '2px solid #1976d2',
+              borderRadius: isRotation ? '50%' : '2px',
               pointerEvents: 'auto',
-              cursor: handle.type === 'rotation' ? 'crosshair' : getResizeCursor(handle.position),
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+              cursor: isRotation ? 'grab' : getResizeCursor(handle.position),
+              boxShadow: isRotation
+                ? '0 2px 8px rgba(0,0,0,0.15)'
+                : '0 2px 4px rgba(0,0,0,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.1s ease',
             }}
-          />
+            onMouseEnter={(e) => {
+              if (isRotation) {
+                e.currentTarget.style.transform = 'scale(1.1)'
+                e.currentTarget.style.cursor = 'grab'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (isRotation) {
+                e.currentTarget.style.transform = 'scale(1)'
+              }
+            }}
+          >
+            {isRotation && (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                style={{ color: '#666' }}
+              >
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+              </svg>
+            )}
+          </div>
         )
       })}
     </div>
   )
 })
 
-export default TransformHandles
+export default Transformer
