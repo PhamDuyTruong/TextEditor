@@ -31,31 +31,31 @@ const FloatingToolbar = observer(({ isEditing }) => {
     if (!canvas) return
 
     const rect = canvas.getBoundingClientRect()
-    
+
     // Scale from canvas coordinates to screen coordinates
     const scaleX = canvas.width / rect.width
     const scaleY = canvas.height / rect.height
-    
+
     // Calculate center X position of the element (on screen)
     const elementCenterX = (selectedElement.x + selectedElement.width / 2) / scaleX
-    
+
     // Position 16px above the element (on screen)
     const elementTopY = selectedElement.y / scaleY
-    const gap = 16 // Gap between toolbar and element
-    
+    const gap = 40 // Gap between toolbar and element
+
     // Get actual toolbar dimensions (or use defaults)
     const toolbarWidth = toolbarRef.current?.offsetWidth || 200
     const toolbarHeight = toolbarRef.current?.offsetHeight || 48
-    
+
     // Calculate toolbar position (centered horizontally above element)
     let x = rect.left + elementCenterX - toolbarWidth / 2
     let y = rect.top + elementTopY - toolbarHeight - gap
-    
+
     // Clamp to viewport with padding
     const viewportPadding = 10
     x = Math.max(viewportPadding, Math.min(x, window.innerWidth - toolbarWidth - viewportPadding))
     y = Math.max(viewportPadding, Math.min(y, window.innerHeight - toolbarHeight - viewportPadding))
-    
+
     // If toolbar would be above viewport, position it below the element instead
     if (y < viewportPadding) {
       y = rect.top + (selectedElement.y + selectedElement.height) / scaleY + gap
@@ -126,8 +126,8 @@ const FloatingToolbar = observer(({ isEditing }) => {
     setLinkDialogOpen(false)
   }
 
-  // Hide toolbar when editing text (Canva-like behavior)
-  if (!selectedElement || isEditing) {
+  // Hide toolbar when editing text or dropdown is open (Canva-like behavior)
+  if (!selectedElement || isEditing || canvasStore.isDropdownOpen) {
     return null
   }
 

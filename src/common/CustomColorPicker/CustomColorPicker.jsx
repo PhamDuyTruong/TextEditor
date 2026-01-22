@@ -1,14 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './CustomColorPicker.scss'
 
-const CustomColorPicker = ({ 
-  value, 
-  onChange, 
+const CustomColorPicker = ({
+  value,
+  onChange,
   disabled = false,
-  presetColors = []
+  presetColors = [],
+  onOpenChange
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const pickerRef = useRef(null)
+
+  // Notify parent when picker open state changes
+  useEffect(() => {
+    onOpenChange?.(isOpen)
+  }, [isOpen, onOpenChange])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -38,7 +44,7 @@ const CustomColorPicker = ({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
       >
-        <div 
+        <div
           className="custom-color-picker__preview"
           style={{ backgroundColor: value }}
         />

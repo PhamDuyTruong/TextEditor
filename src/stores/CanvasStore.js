@@ -17,6 +17,8 @@ class CanvasStore {
   pageWidth = 1080
   pageHeight = 1080
   backgroundColor = '#ffffff'
+  // UI state
+  isDropdownOpen = false
 
   constructor() {
     makeObservable(this, {
@@ -28,6 +30,7 @@ class CanvasStore {
       backgroundColor: observable,
       pageWidth: observable,
       pageHeight: observable,
+      isDropdownOpen: observable,
       selectedElement: computed,
       hasSelection: computed,
       addElement: action,
@@ -42,6 +45,7 @@ class CanvasStore {
       setPan: action,
       setBackgroundColor: action,
       setPageSize: action,
+      setDropdownOpen: action,
       saveState: action,
       restoreState: action,
       undo: action,
@@ -205,6 +209,14 @@ class CanvasStore {
     this.pageWidth = width
     this.pageHeight = height
     this.saveState()
+  }
+
+  /**
+   * Set dropdown open state
+   * @param {boolean} isOpen - Is dropdown open
+   */
+  setDropdownOpen(isOpen) {
+    this.isDropdownOpen = isOpen
   }
 
   /**

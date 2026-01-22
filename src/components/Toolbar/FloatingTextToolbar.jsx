@@ -38,6 +38,10 @@ const FloatingTextToolbar = observer(() => {
     }
   }
 
+  const handleDropdownOpenChange = (isOpen) => {
+    canvasStore.setDropdownOpen(isOpen)
+  }
+
   const hasSelection = canvasStore.hasSelection
 
   // Common colors palette
@@ -55,6 +59,7 @@ const FloatingTextToolbar = observer(() => {
           value={selectedElement?.fontSize || 24}
           onChange={handleFontSizeChange}
           disabled={!hasSelection}
+          onOpenChange={handleDropdownOpenChange}
         />
 
         <CustomDivider />
@@ -65,6 +70,7 @@ const FloatingTextToolbar = observer(() => {
           onChange={handleColorChange}
           disabled={!hasSelection}
           presetColors={presetColors}
+          onOpenChange={handleDropdownOpenChange}
         />
 
         <CustomDivider />
@@ -96,14 +102,14 @@ const FloatingTextToolbar = observer(() => {
             />
             <ToolbarButton
               icon={<AlignJustifyIcon />}
-            onClick={() => handleAlignmentChange('justify')}
-            disabled={!hasSelection}
-            selected={selectedElement?.alignment === 'justify'}
-            tooltip="Align Justify"
-          />
-         </div>
+              onClick={() => handleAlignmentChange('justify')}
+              disabled={!hasSelection}
+              selected={selectedElement?.alignment === 'justify'}
+              tooltip="Align Justify"
+            />
+          </div>
         </div>
-       
+
       </div>
     </div>
   )

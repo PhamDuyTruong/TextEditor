@@ -1,16 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './CustomDropdown.scss'
 
-const CustomDropdown = ({ 
-  value, 
-  onChange, 
-  options, 
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
   disabled = false,
   label,
-  className = ''
+  className = '',
+  onOpenChange
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
+
+  // Notify parent when dropdown open state changes
+  useEffect(() => {
+    onOpenChange?.(isOpen)
+  }, [isOpen, onOpenChange])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -42,10 +48,10 @@ const CustomDropdown = ({
         disabled={disabled}
       >
         <span className="custom-dropdown__value">{value}</span>
-        <svg 
-          className="custom-dropdown__icon" 
-          width="12" 
-          height="12" 
+        <svg
+          className="custom-dropdown__icon"
+          width="12"
+          height="12"
           viewBox="0 0 12 12"
         >
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" />

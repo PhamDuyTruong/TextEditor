@@ -5,7 +5,7 @@ import { getRotatedBoundingBox } from '../../utils/canvasUtils'
 import { useThrottledCallback } from '../../hooks'
 
 const HANDLE_SIZE = 8
-const ROTATION_HANDLE_DISTANCE = 30
+const ROTATION_HANDLE_DISTANCE = 16
 
 const TransformHandles = observer(({ isEditing }) => {
   const canvasRef = useRef(null)
